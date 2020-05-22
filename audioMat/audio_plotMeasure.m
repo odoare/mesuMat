@@ -16,10 +16,11 @@ function h = audio_plotMeasure(mesu,nn)
     plot(mesu.t,mesu.y,'linewidth',2) ;
     ylim([-1.1 1.1]) ;
     xlabel ('T (s)') ;
-    ylabel ('Volts') ;
+    ylabel ('Data (-)') ;
 
     hold on
     plot([min(mesu.t),max(mesu.t)],[1 1])
     plot([min(mesu.t),max(mesu.t)],[-1,-1])
     hold off
-    legend([mesu.inDesc {'-1V','1V'}]) ;
+    legend([mesu.inDesc {'-1 (0 dBFS)','1 (0 dBFS)'}]) ;
+    
