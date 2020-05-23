@@ -12,7 +12,7 @@ s = daq.createSession('ni');
 % Set session properties
 % Up sampling not implemented yet for NI cards
 % s.Rate = mesu.effectiveFrequency; % sampling rate
-s.Rate = Fs ;
+s.Rate = mesu.Fs ;
 
 % Add Input Channels to Session
 for i1 = 1:length(mesu.inMap)
