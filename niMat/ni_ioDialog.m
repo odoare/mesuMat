@@ -10,7 +10,7 @@ function mesu = ni_ioDialog(mesu)
 %
 % All the parameters are stored in the output structure "mesu".
 %
-% v0.01 - May, 19th 2020 - O. Doaré - olivier.doare@ensta-paris.fr
+% v0.01 - May, 19th 2020 - O. Doarï¿½ - olivier.doare@ensta-paris.fr
 
     default = ni_defaultMeasure() ;
     
@@ -87,16 +87,17 @@ function mesu = ni_ioDialog(mesu)
        'String','2',...
        'Callback',@duration_callback);
 
-	% Upsampling
-    txt = uicontrol('Parent',d,...
-       'Style','text',...
-       'Position',[280 350 100 20],...
-       'String','Upsampling');
-    upSampling = uicontrol('Parent',d,...
-       'Style','edit',...
-       'Position',[280 330 100 20],...
-       'String','16',...
-       'Callback',@upSampling_callback);
+    % Up sampling not implemented yet for NI cards
+    % Upsampling
+    % txt = uicontrol('Parent',d,...
+    %   'Style','text',...
+    %   'Position',[280 350 100 20],...
+    %   'String','Upsampling');
+    %upSampling = uicontrol('Parent',d,...
+    %   'Style','edit',...
+    %   'Position',[280 330 100 20],...
+    %   'String','16',...
+    %   'Callback',@upSampling_callback);
 
 	% Input Channels
     txt = uicontrol('Parent',d,...
@@ -263,10 +264,11 @@ function mesu = ni_ioDialog(mesu)
         mesu.duration = default.duration ;
     end
 
-    if isfield(mesu,'upSample')==0
-        mesu.upSample = default.upSample ;       
-    end
-    
+    % Up sampling not implemented yet for NI cards
+%     if isfield(mesu,'upSample')==0
+%         mesu.upSample = default.upSample ;       
+%     end
+     
     if isfield(mesu,'inDesc')==0
         mesu.inDesc = default.inDesc ;
     end
@@ -318,7 +320,8 @@ function mesu = ni_ioDialog(mesu)
     set(fileName,'String',mesu.saveFile) ;
     set(Fs,'String',num2str(mesu.Fs)) ;
     set(duration,'String',num2str(mesu.duration)) ;
-    set(upSampling,'String',num2str(mesu.upSample)) ;
+    % Up sampling not implemented yet for NI cards
+    % set(upSampling,'String',num2str(mesu.upSample)) ;
     set(plotData,'Value',mesu.displayLiveData+2) ;
     index = find(strcmp(deviceChoices, mesu.daqID)) ;
     mesu.daqName = a(index).Description ;
@@ -359,7 +362,8 @@ function mesu = ni_ioDialog(mesu)
     index = find(strcmp(sigGenChoices, mesu.sgType)) ;
     set(sigGenType,'Value',index) ;
     
-    mesu.effectiveFrequency = mesu.Fs * mesu.upSample ;
+    % % Up sampling not implemented yet for NI cards
+    % mesu.effectiveFrequency = mesu.Fs * mesu.upSample ;
     
     %%%
 
@@ -412,9 +416,10 @@ function mesu = ni_ioDialog(mesu)
         mesu.duration = str2num(edit.String)
     end
 
-    function upSampling_callback(edit,event)
-        mesu.upSample = str2num(edit.String)
-    end
+    % Up sampling not implemented yet for NI cards
+%     function upSampling_callback(edit,event)
+%         mesu.upSample = str2num(edit.String)
+%     end
 
     function inChannels_callback(popup,event)
         mesu.inMap = inChannels.Value ;

@@ -6,7 +6,8 @@ function mesu = ni_defaultMeasure()
     mesu.daqID = 'Dev1' ;
     mesu.Fs = 44100 ;
     mesu.duration = 2 ;
-    mesu.upSample = 1 ;
+    % Up sampling not implemented yet for NI cards
+    % mesu.upSample = 1 ;
     mesu.inMap = [1 2] ;
     mesu.inDesc = {'ai0Info','ai1Info'} ;
     mesu.inCal = [1 1] ;
