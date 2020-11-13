@@ -23,7 +23,6 @@ function h = plotMeasureWithCal(mesu,nn)
 
     legendca = {} ;
     for i1=1:length(mesu.inDesc)
-        disp(i1)
         %legendca = {legendca{:} ; ['Channel ',num2str(i1),' (',mesu.inUnit{1},')']} ;
         legendca = {legendca{:} , [mesu.inDesc{i1},' (',mesu.inUnit{i1},')']} ;
     end

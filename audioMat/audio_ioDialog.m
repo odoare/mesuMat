@@ -199,8 +199,12 @@ function mesu = audio_ioDialog(mesu)
        'TooltipString',['Select the desired inputs',...
             newline,'(hold ctrl or shift to select more)'],...
        'Callback',@inChannels_callback);
-   
-   
+  
+    if max(mesu.inMap)>length(inChannelsStrings)
+      mesu.inMap = [1] ;
+    end
+    set(inChannels,'Value',mesu.inMap) ;
+
     % 0dBFS
     txt = uicontrol('Parent',d,...
         'Style','text',...
@@ -408,11 +412,7 @@ function mesu = audio_ioDialog(mesu)
         [inChannelsStrings,outChannelsStrings] = getChannelsStrings(apr) ;
         release(apr) ;
 
-        set(inChannels,'String',inChannelsStrings)
-        if max(mesu.inMap)>length(inChannelsStrings)
-          mesu.inMap = [] ;
-        end
-        set(inChannels,'Value',mesu.inMap) ;
+
         set(outChannel,'String',outChannelsStrings)
         if max(mesu.outMap)>length(outChannelsStrings)
           mesu.outMap = [] ;
