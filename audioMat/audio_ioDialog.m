@@ -10,7 +10,7 @@ function mesu = audio_ioDialog(mesu)
 %
 % All the parameters are stored in the output structure "mesu".
 %
-% v0.01 - May, 19th 2020 - O. Doarï¿½ - olivier.doare@ensta-paris.fr
+% O. Doaré - olivier.doare@ensta-paris.fr
 
     default = audio_defaultMeasure() ;
     maxChan = 8 ;
@@ -433,7 +433,7 @@ function mesu = audio_ioDialog(mesu)
 
     function Fs_callback(edit,event)
         mesu.Fs = str2num(edit.String) ;
-        mesu.effectiveFrequency = mesu.Fs * mesu.upSample ;
+        %mesu.effectiveFrequency = mesu.Fs * mesu.upSample ;
         affichemesu ;
     end
 
