@@ -1,4 +1,4 @@
-function mesu = ni_ioDialog(mesu)
+function [mesu,ok] = ni_ioDialog(mesu)
 %
 % mesu = ni_ioDialog(mesu)
 %
@@ -10,15 +10,91 @@ function mesu = ni_ioDialog(mesu)
 %
 % All the parameters are stored in the output structure "mesu".
 %
-% v0.01 - May, 19th 2020 - O. Doarï¿½ - olivier.doare@ensta-paris.fr
+% O. Doaré - olivier.doare@ensta-paris.fr
 
     default = ni_defaultMeasure() ;
     
     maxChan = 8 ;
+    
+    ok = false;
  
+    if ~exist('mesu')
+       mesu = struct() ;
+    end
+
+    if isfield(mesu,'inMap')==0
+        mesu.inMap = default.inMap ;
+    end
+    
+    if isfield(mesu,'saveFile')==0
+        mesu.saveFile = default.saveFile ;
+    end
+
+    if isfield(mesu,'Fs')==0
+        mesu.Fs = default.Fs ;
+    end
+
+    if isfield(mesu,'duration')==0
+        mesu.duration = default.duration ;
+    end
+
+    % Up sampling not implemented yet for NI cards
+%     if isfield(mesu,'upSample')==0
+%         mesu.upSample = default.upSample ;       
+%     end
+     
+    if isfield(mesu,'inDesc')==0
+        mesu.inDesc = default.inDesc ;
+    end
+
+    if isfield(mesu,'inCal')==0
+        mesu.inCal = default.inCal ;       
+    end
+
+    if isfield(mesu,'inUnit')==0
+        mesu.inUnit = default.inUnit ;       
+    end
+
+    if isfield(mesu,'sg')==0
+        mesu.sg = default.sg ;
+    end
+
+    if isfield(mesu,'sgType')==0
+        mesu.sgType = default.sgType ;
+    end
+    
+    if isfield(mesu,'sgAmplitude')==0
+        mesu.sgAmplitude = default.sgAmplitude ;
+    end
+
+    if isfield(mesu,'sgStartFrequency')==0
+        mesu.sgStartFrequency = default.sgStartFrequency ;
+    end
+
+    if isfield(mesu,'sgEndFrequency')==0
+        mesu.sgEndFrequency = default.sgEndFrequency ;
+    end
+
+    if isfield(mesu,'sgRepetitions')==0
+        mesu.sgRepetitions = default.sgRepetitions ;
+    end
+    
+%     if isfield(mesu,'displayLiveData')==0
+%         mesu.displayLiveData = default.displayLiveData ;
+%     end
+    
+    if isfield(mesu,'daqID')==0
+        mesu.daqID = default.daqID ;
+    end
+    
+    if isfield(mesu,'outMap')==0
+        mesu.outMap = default.outMap ;
+    end
+       
     inChannelsStrings = {} ;
-    outChannelsStrings = {} ; 
-    a = daq.getDevices ;
+    outChannelsStrings = {} ;
+    daq.reset;
+    a = daq.getDevices;
     
     for i1 = 1:length(a)
         deviceChoices{i1} = a(i1).ID ;
@@ -29,10 +105,11 @@ function mesu = ni_ioDialog(mesu)
     plotDataChoices = {'ask', 'no', 'yes'} ;
      
     sigGenChoices = {'LogSweep', 'Noise', 'File'} ;  
-   
+
     d = dialog('Position',[300 300 600 500],'Name','National Instrument dialog');
     
     % Device
+
     txt = uicontrol('Parent',d,...
        'Style','text',...
        'Position',[20 430 80 40],...
@@ -42,17 +119,27 @@ function mesu = ni_ioDialog(mesu)
         'Position',[110 450 100 20],...
         'String',deviceChoices,...
         'Callback',@device_callback);
+ 
+    if any(strcmp(deviceChoices,mesu.daqID))
+        set(device,'Value',find(strcmp(deviceChoices, mesu.daqID)));
+    else
+        set(device,'Value',1);
+    end       
     
+    mesu.daqID = device.String{device.Value} ;
+    mesu.daqName = a(device.Value).Description ;
+
     % Plot data ? (not working yet)
-    txt = uicontrol('Parent',d,...
-       'Style','text',...
-       'Position',[300 430 80 40],...
-       'String','Plot data ? (not working yet)');
-    plotData = uicontrol('Parent',d,...
-       'Style','popup',...
-       'Position',[390 450 100 20],...
-       'String',plotDataChoices,...
-       'Callback',@plotData_callback);
+%     txt = uicontrol('Parent',d,...
+%        'Style','text',...
+%        'Position',[300 430 80 40],...
+%        'String','Plot data ? (not working yet)');
+%     plotData = uicontrol('Parent',d,...
+%        'Style','popup',...
+%        'Position',[390 450 100 20],...
+%        'String',plotDataChoices,...
+%        'Callback',@plotData_callback,...
+%        'Value',mesu.displayLiveData+2);
 
     % File name
     txt = uicontrol('Parent',d,...
@@ -62,7 +149,7 @@ function mesu = ni_ioDialog(mesu)
     fileName = uicontrol('Parent',d,...
        'Style','edit',...
        'Position',[20 390 360 20],...
-       'String','test.mat',...
+       'String',mesu.saveFile,...
        'Callback',@fileName_callback);
 
    % Frequency
@@ -73,8 +160,8 @@ function mesu = ni_ioDialog(mesu)
     Fs = uicontrol('Parent',d,...
         'Style','edit',...
         'Position',[20 330 100 20],...
-        'String','44100',...
-        'Callback',@Fs_callback);
+        'Callback',@Fs_callback,...
+        'String',num2str(mesu.Fs));
 
     % Duration
     txt = uicontrol('Parent',d,...
@@ -84,7 +171,7 @@ function mesu = ni_ioDialog(mesu)
     duration = uicontrol('Parent',d,...
        'Style','edit',...
        'Position',[150 330 100 20],...
-       'String','2',...
+       'String',num2str(mesu.duration),...
        'Callback',@duration_callback);
 
     % Up sampling not implemented yet for NI cards
@@ -138,7 +225,6 @@ function mesu = ni_ioDialog(mesu)
            'Callback',@inChannels_callback); 
     end
 
-
     % Info
     txt = uicontrol('Parent',d,...
         'Style','text',...
@@ -162,7 +248,7 @@ function mesu = ni_ioDialog(mesu)
     btnGo = uicontrol('Parent',d,...
        'Position',[300 30 70 25],...
        'String','Go',...
-       'Callback','delete(gcf)');
+       'Callback',@letsGo);
 
     %%%
     txt = uicontrol('Parent',d,...
@@ -243,110 +329,31 @@ function mesu = ni_ioDialog(mesu)
        'String','3',...
        'Callback',@repetitions_callback);
 
-
-    if ~exist('mesu')
-       mesu = struct() ;
-    end
-
-    if isfield(mesu,'inMap')==0
-        mesu.inMap = default.inMap ;
-    end
-    
-    if isfield(mesu,'saveFile')==0
-        mesu.saveFile = default.saveFile ;
-    end
-
-    if isfield(mesu,'Fs')==0
-        mesu.Fs = default.Fs ;
-    end
-
-    if isfield(mesu,'duration')==0
-        mesu.duration = default.duration ;
-    end
-
-    % Up sampling not implemented yet for NI cards
-%     if isfield(mesu,'upSample')==0
-%         mesu.upSample = default.upSample ;       
-%     end
-     
-    if isfield(mesu,'inDesc')==0
-        mesu.inDesc = default.inDesc ;
-    end
-
-    if isfield(mesu,'inCal')==0
-        mesu.inCal = default.inCal ;       
-    end
-
-    if isfield(mesu,'inUnit')==0
-        mesu.inUnit = default.inUnit ;       
-    end
-
-    if isfield(mesu,'sg')==0
-        mesu.sg = default.sg ;
-    end
-
-    if isfield(mesu,'sgType')==0
-        mesu.sgType = default.sgType ;
-    end
-    
-    if isfield(mesu,'sgAmplitude')==0
-        mesu.sgAmplitude = default.sgAmplitude ;
-    end
-
-    if isfield(mesu,'sgStartFrequency')==0
-        mesu.sgStartFrequency = default.sgStartFrequency ;
-    end
-
-    if isfield(mesu,'sgEndFrequency')==0
-        mesu.sgEndFrequency = default.sgEndFrequency ;
-    end
-
-    if isfield(mesu,'sgRepetitions')==0
-        mesu.sgRepetitions = default.sgRepetitions ;
-    end
-    
-    if isfield(mesu,'displayLiveData')==0
-        mesu.displayLiveData = default.displayLiveData ;
-    end
-
-    if isfield(mesu,'daqID')==0
-        mesu.daqID = default.daqID ;
-    end
-    
-    if isfield(mesu,'outMap')==0
-        mesu.outMap = default.outMap ;
-    end
-
-    set(fileName,'String',mesu.saveFile) ;
-    set(Fs,'String',num2str(mesu.Fs)) ;
-    set(duration,'String',num2str(mesu.duration)) ;
     % Up sampling not implemented yet for NI cards
     % set(upSampling,'String',num2str(mesu.upSample)) ;
-    set(plotData,'Value',mesu.displayLiveData+2) ;
-    index = find(strcmp(deviceChoices, mesu.daqID)) ;
-    mesu.daqName = a(index).Description ;
-    set(device,'Value',index) ;
-    set(inChannels,'String',inChannelsStrings{index})
-    if max(mesu.inMap)>length(inChannelsStrings{index})
+
+    set(inChannels,'String',inChannelsStrings{device.Value})
+    if max(mesu.inMap)>length(inChannelsStrings{device.Value})
         mesu.inMap = [] ;
     end
     set(inChannels,'Value',mesu.inMap) ;
     mesu.inName = {} ;
     mesu.outName = {} ;
-    set(outChannel,'String',outChannelsStrings{index})
-    if max(mesu.outMap)>length(outChannelsStrings{index})
+    set(outChannel,'String',outChannelsStrings{device.Value})
+    if max(mesu.outMap)>length(outChannelsStrings{device.Value})
       mesu.outMap = [] ;
     end
     set(outChannel,'Value',mesu.outMap) ;
-    mesu.outName = outChannelsStrings{device.Value}{outChannel.Value}
+    mesu.outName = outChannelsStrings{device.Value}{outChannel.Value};
+
     for i1=1:maxChan
-        if i1<length(inChannels)+2
+        if i1<=length(inChannels.Value)
             set(info{i1},'String',mesu.inDesc{i1}) ;
             set(unit{i1},'String',mesu.inUnit{i1}) ;
-            set(cal{i1},'String',num2str(mesu.inCal(i1))) ;    
+            set(cal{i1},'String',num2str(mesu.inCal(i1))) ;
             mesu.inName{i1} = inChannelsStrings{device.Value}{inChannels.Value(i1)} ;
         else
-            set(info{i1},'String','') ;
+            set(info{i1},'String','Channel description') ;
             set(unit{i1},'String','V') ;
             set(cal{i1},'String','1') ;
         end
@@ -357,8 +364,8 @@ function mesu = ni_ioDialog(mesu)
     set(amplitude,'String',num2str(mesu.sgAmplitude)) ;
     set(startFrequency,'String',num2str(mesu.sgStartFrequency)) ;
     set(endFrequency,'String',num2str(mesu.sgEndFrequency)) ;
-%     set(repetitions,'String',num2str(mesu.sgRepetitions)) ;
-    
+%   set(repetitions,'String',num2str(mesu.sgRepetitions)) ;
+                                  
     index = find(strcmp(sigGenChoices, mesu.sgType)) ;
     set(sigGenType,'Value',index) ;
     
@@ -374,11 +381,12 @@ function mesu = ni_ioDialog(mesu)
     % Callback functions
     
     function device_callback(popup,event)
+      mesu.selectedDevice = popup.Value ;
       mesu.daqID = popup.String{popup.Value} ;
       mesu.daqName = a(find(strcmp(deviceChoices, mesu.daqID))).Description ;
       set(inChannels,'String',inChannelsStrings{popup.Value})
       if max(mesu.inMap)>length(inChannelsStrings{popup.Value})
-          mesu.inMap = [] ;
+          mesu.inMap = [1] ;
       end
       set(inChannels,'Value',mesu.inMap) ;
       set(outChannel,'String',outChannelsStrings{popup.Value})
@@ -409,7 +417,7 @@ function mesu = ni_ioDialog(mesu)
 
     function Fs_callback(edit,event)
         mesu.Fs = str2num(edit.String)
-        mesu.effectiveFrequency = mesu.Fs * mesu.upSample ;
+        %mesu.effectiveFrequency = mesu.Fs * mesu.upSample ;
     end
 
     function duration_callback(edit,event)
@@ -468,4 +476,10 @@ function mesu = ni_ioDialog(mesu)
             mesu.sgFile = fullfile(pathname,filename) ;
         end
     end
+
+    function letsGo(edit,event)
+        ok = true;
+        delete(gcf);
+    end
 end
+

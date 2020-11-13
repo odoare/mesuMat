@@ -20,7 +20,7 @@
 % 3. The resulting data is plotted and the "mesu" structure is saved in the
 % file described by the "mesu.saveFile" string.
 %
-% v0.01 - May, 19th 2020 - O. Doaré - olivier.doare@ensta-paris.fr
+% O. Doaré - olivier.doare@ensta-paris.fr
 
 if exist('mesu')~=0
     if isfield(mesu,'nogui')
@@ -28,10 +28,15 @@ if exist('mesu')~=0
             mesu = ni_ioDialog(mesu) ;
         end
     else
-        mesu = ni_ioDialog(mesu) ;
+        [mesu,ok] = ni_ioDialog(mesu) ;
     end
 else
-    mesu = ni_ioDialog() ;
+    [mesu,ok] = ni_ioDialog() ;
+end
+
+if ~ok
+   warning('Script cancelled by user');
+   return;
 end
 
 mesu = createOutputSignal(mesu) ;
@@ -41,7 +46,7 @@ mesu = ni_myStream(mesu) ;
 if isfield(mesu,'saveFile')
     save (mesu.saveFile,'mesu') ;
 else
-    warning('Warning: no saveFile, data not saved')
+    warning('Warning: no saveFile field given, data not saved')
 end
 
 ni_plotMeasure(mesu) ;

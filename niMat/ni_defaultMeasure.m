@@ -3,13 +3,13 @@ function mesu = ni_defaultMeasure()
 % Outputs the default set of measurement parameters in the structure "mesu"
 
     mesu.saveFile = 'outputfilename.mat' ;
-    mesu.daqID = 'Dev1' ;
+    mesu.daqID = 'Dev1';
     mesu.Fs = 44100 ;
     mesu.duration = 2 ;
     % Up sampling not implemented yet for NI cards
     % mesu.upSample = 1 ;
-    mesu.inMap = [1 2] ;
-    mesu.inDesc = {'ai0Info','ai1Info'} ;
+    mesu.inMap = [1] ;
+    mesu.inDesc = {'ai0 Desc','ai1 Desc','ai2 Desc','ai3 Desc','ai4 Desc','ai5 Desc'} ;
     mesu.inCal = [1 1] ;
     mesu.inUnit = {'V', 'V'} ;
     mesu.sg = 0 ;
