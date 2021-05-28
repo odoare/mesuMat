@@ -58,7 +58,7 @@ win=hanning(NFFT);
 freq=(0:NFFT/2)*Fs/NFFT;
 
 H = tfestimate(fact(map(1))*mesu.y(:,map(1))/mesu.inCal(map(1)),...
-    fact(map(2))*mesu.y(:,map(2))./mesu.inCal(map(1)),win,N_ov,NFFT) ;
+    fact(map(2))*mesu.y(:,map(2))./mesu.inCal(map(2)),win,N_ov,NFFT) ;
 
 if displayPlot
     subplot(2,1,1)
